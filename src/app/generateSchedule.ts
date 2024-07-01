@@ -68,6 +68,8 @@ function scheduleTaskWithDuration(task: Task, availability: Availability, schedu
   return null 
 }
 
+
+
   // TODO: export to lib file
 // function formatTime(date: Date): string {
 //   const hours = date.getHours() % 12 || 12; // Use 12-hour format

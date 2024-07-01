@@ -1,4 +1,4 @@
-import { Availability, Task } from "../generateSchedule";
+import { Availability, Task, generateSchedule } from "../generateSchedule";
 
 export const availabilityOne: Availability = {
   startTime: new Date("2024-07-02T09:00:00"), // Wednesday, July 2nd at 9:00 AM
@@ -34,3 +34,7 @@ export const testTasks: Task[] = [
     duration: 30, // 30 minutes
   },
 ];
+
+console.log(generateSchedule(availabilityOne, testTasks))
+console.log("2nd Test")
+console.log(generateSchedule(availabilityTwo, testTasks))
