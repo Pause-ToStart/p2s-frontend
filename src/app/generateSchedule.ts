@@ -41,6 +41,8 @@ export function generateSchedule(availability: Availability, tasks: Task[]): Tas
     durationTaskScheduled ? scheduledTasks.push(durationTaskScheduled) : console.warn(`Couldn't find a slot for task '${task.name}' with duration ${task.duration} minutes.`);
   }
 
+  scheduledTasks.sort((a,b) => a.startTime.getTime() - b.startTime.getTime()); 
+
   return scheduledTasks;
 }
 
@@ -71,10 +73,10 @@ function scheduleTaskWithDuration(task: Task, availability: Availability, schedu
 
 
   // TODO: export to lib file
-// function formatTime(date: Date): string {
-//   const hours = date.getHours() % 12 || 12; // Use 12-hour format
-//   const minutes = date.getMinutes().toString().padStart(2, "0");
-//   const indicator = date.getHours() >= 12 ? "PM" : "AM";
-//   return `${hours}:${minutes} ${indicator}`;
-//   }
+export function formatTime(date: Date): string {
+  const hours = date.getHours() % 12 || 12;
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const indicator = date.getHours() >= 12 ? "PM" : "AM";
+  return `${hours}:${minutes} ${indicator}`;
+  }
 
