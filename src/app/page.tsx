@@ -1,5 +1,4 @@
 import React from "react";
-import ViewSchedule from "./schedule/page";
 import Link from "next/link";
 
 export default function Home() {
