@@ -35,6 +35,6 @@ export const testTasks: Task[] = [
   },
 ];
 
-console.log(generateSchedule(availabilityOne, testTasks))
-console.log("2nd Test")
-console.log(generateSchedule(availabilityTwo, testTasks))
+// console.log(generateSchedule(availabilityOne, testTasks))
+// console.log("2nd Test")
+// console.log(generateSchedule(availabilityTwo, testTasks))
