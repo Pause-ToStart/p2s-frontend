@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from 'react'
 import { Task, Availability, ScheduledTasks } from "../../app/generateSchedule";
 
@@ -7,47 +7,49 @@ const Form = () => {
     const enum taskTypes {
         duration = 'duration', scheduled = 'scheduled'
     }
-
-    const [startTime , setStartTime] = useState<string>("9:00 am");
-    const [endTime, setEndTime] = useState<string>("10:00 pm")
+    const [availability, setAvailability] = useState({
+        startTime: "9:00 am",
+        endTime: "10:00 pm"
+    })
+    const [durationTask, setDurationTask] = useState({
+        type: taskTypes.duration,
+        name: "",
+        duration: 0
+    })
     const [taskList, setTaskList] = useState([])
-    const [taskName, setTaskName] = useState('test')
-    const [taskDurationMinutes, setTaskDurationMinutes] = useState<string>('30')
-    const [taskStartTime, setTaskStartTime] = useState()
-    const [taskEndTime, setTaskEndTime] = useState()
-    const [durationTask, setDurationTask] = useState()
-    const [scheduledTask, setScheduledTask] = useState()
     const [activeTaskTab, setActiveTaskTab] = useState<taskTypes>(taskTypes.duration)
 
-    console.log("taskList", taskList)
-
+    const handleAvailabilityChange = (e) =>
+        {
+            setAvailability((prevState) => ({...prevState, [e.target.name]: e.target.value}))
+        }
 
     const renderAvailability = () => {
         return (
             <>
             <div>Availability</div>
             <label>start time </label>
-            <input className="border-2" type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)}/>
+            <input className="border-2" type="text" name="startTime" value={availability.startTime} onChange={handleAvailabilityChange}/>
             <label>end time </label>
-            <input className="border-2" type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)}/>
+            <input className="border-2" type="text" name="endTime" value={availability.endTime} onChange={handleAvailabilityChange}/>
             </>
         )
 
     }
-    const createTask = () => {
+
+    const createTask = (taskType) => {
         // TODO: can move this to time lib file - may need eslewhere
         const convertMinutesDurationToMillisecondsDuration = (minutesDuration) => {
             return minutesDuration * 60 * 1000
         }
 
-        switch(activeTaskTab) {
+        switch(taskType) {
             case taskTypes.duration: 
-                const durationTask : Task = {
-                    name: taskName,
-                    duration: convertMinutesDurationToMillisecondsDuration(taskDurationMinutes)
+                const task : Task = {
+                    name: durationTask.name,
+                    duration: convertMinutesDurationToMillisecondsDuration(durationTask.duration)
                 }
-                setTaskList(taskList.concat(durationTask))
-                console.log("taskList", taskList)
+                setTaskList((prevList) => prevList.concat(durationTask))
                 break;
             case taskTypes.scheduled:
                 // const scheudledTask : ScheduledTasks = {
@@ -57,21 +59,27 @@ const Form = () => {
         }
     }
 
+    const handleDurationTaskChange = (e) => {
+        setDurationTask((prevState) => ({...prevState, [e.target.name]: e.target.value}))
+    }
+
     const renderDurationTask = () => {
         return (
             <>
+            <label>task name</label>
+            <input className="border-2" type="text" name="name" value={durationTask.name} onChange={handleDurationTaskChange}/>
             <label>Duration in minutes</label>
-            <input className="border-2" type="text" value={taskDurationMinutes} onChange={(e) => setTaskDurationMinutes(e.target.value)}></input>
-            <button className="bg-slate-500 text-white rounded" onClick={() => {
-                createTask()
+            <input className="border-2" type="text" name="duration" value={durationTask.duration} onChange={handleDurationTaskChange}></input>
+            <button className="bg-slate-500 text-white rounded" onClick={(e) => {e.preventDefault()
+                createTask(taskTypes.duration)
             }}>submit</button>
             </>
         )
     }
 
-    const renderScheduledTask = () => {
-        // todo: render scheduled task
-    }
+    // const renderScheduledTask = () => {
+    //     // todo: render scheduled task
+    // }
 
 
 
@@ -89,8 +97,6 @@ const Form = () => {
                 )
             })}
              </div>
-        <label>task name</label>
-        <input className="border-2" type="text" value={taskName} onChange={(e) => setTaskName(e.target.value)}/>
         {renderDurationTask()}
         </>
         )
@@ -108,7 +114,15 @@ const Form = () => {
             return (
                 <>
                 {taskList.map((task, index) => {
-                    <div key={`task-list-${index}`}>{task.name}</div>
+                    {console.log("task item", index,  task)}
+                    return(
+                        <div key={`task-list-item-${index}`}>
+                            <span>name: </span>
+                            <span>{task.name }</span>
+                            <span>duration: </span>
+                            <span>{task.duration}</span>
+                        </div>
+                    )
                 })}
                 </>
             )
