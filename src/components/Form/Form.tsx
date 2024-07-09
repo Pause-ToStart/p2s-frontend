@@ -1,9 +1,14 @@
 'use client'
-import { act, useEffect, useState } from "react";
+import { useState } from "react";
 import React from 'react'
 import { Task, Availability, ScheduledTasks } from "../../app/generateSchedule";
 
 const Form = () => {
+    // TODO: constraints for today, current time vs past time
+    // TODO: availability time left 
+    // TODO: set placeholders for input
+    // TODO: reset input once task is submitted OR user switches to another task type
+
     const enum taskTypes {
         duration = 'duration', scheduled = 'scheduled'
     }
@@ -13,15 +18,14 @@ const Form = () => {
     })
     const [durationTask, setDurationTask] = useState({
         type: taskTypes.duration,
-        name: "test",
-        duration: "30",
+        name: "",
+        duration: "0"
     })
-
     const [scheduledTask, setScheduledTask] = useState({
         type: taskTypes.scheduled,
-        name: "scheduled test",
-        startTime: "3:00 pm",
-        endTime: "3:30 pm"
+        name: "",
+        startTime: "",
+        endTime: "",
     })
     const [taskList, setTaskList] = useState([])
     const [activeTaskTab, setActiveTaskTab] = useState<taskTypes>(taskTypes.duration)
@@ -126,7 +130,6 @@ const Form = () => {
             return (
                 <>
                 {taskList.map((task, index) => {
-                    {console.log("task item", index,  task)}
                     return(
                         <div key={`task-list-item-${index}`}>
                             <span>{`Type: ${task.type} - `}</span>
@@ -154,7 +157,7 @@ const Form = () => {
         // TODO:
         /*
         resets form
-        converts string formats to date formats - can possibly add string AND date format to obj!
+        converts string formats to date formats
         displays schedule
         */
     }
