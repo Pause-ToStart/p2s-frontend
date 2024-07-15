@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { formatTime } from "../lib/time-conversion";
-import { generateSchedule } from "../generateSchedule";
+import { generateSchedule } from "../lib/generateSchedule";
 import { availabilityTime, unscheduledTasks } from "../lib/tasks";
 import { useRouter } from "next/navigation";
 

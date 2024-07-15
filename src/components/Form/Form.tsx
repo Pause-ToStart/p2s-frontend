@@ -2,14 +2,11 @@
 import { useState } from "react";
 import React from 'react'
 import { useRouter } from "next/navigation";
-import { Task, Availability, ScheduledTasks, generateSchedule } from "../../app/generateSchedule";
+import { Task, ScheduledTasks } from "../../app/lib/generateSchedule";
 import { convertStringtoDateTime } from "../../app/lib/time-conversion";
 import { formatTime } from "../../app/lib/time-conversion";
-import { TaskTypes } from "../../app/lib/enum/tasktypes";
-import Link from "next/link";
+import { TaskTypes } from "../../app/lib/enum/taskTypes";
 import { unscheduledTasks, availabilityTime } from "../../app/lib/tasks";
-// TODO: availability time left 
-// TODO: enforce user to input proper date time format
 
 const Form = () => {
     const router = useRouter()
@@ -33,7 +30,7 @@ const Form = () => {
         startTime: "",
         endTime: "",
     })
-    const [taskList, setTaskList] = useState([])
+    const [taskList, setTaskList] = useState<(Task|ScheduledTasks)[]>([])
     const [activeTaskTab, setActiveTaskTab] = useState<TaskTypes>(TaskTypes.duration)
 
     const handleAvailabilityChange = (e) =>

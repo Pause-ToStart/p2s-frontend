@@ -1,7 +1,7 @@
-import { TaskTypes } from "./lib/enum/tasktypes";
+import { TaskTypes } from "./enum/taskTypes";
 export interface Availability {
-  startTime: Date; 
-  endTime: Date; 
+  startTime: Date ; 
+  endTime: Date ; 
 }
 
 export interface Task {
