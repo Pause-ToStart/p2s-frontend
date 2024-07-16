@@ -1,9 +1,11 @@
+import { TaskTypes } from "./enum/taskTypes";
 export interface Availability {
-  startTime: Date; 
-  endTime: Date; 
+  startTime: Date ; 
+  endTime: Date ; 
 }
 
 export interface Task {
+  taskType: TaskTypes;
   name: string;
   duration?: number; 
   startTime?: Date;
@@ -11,6 +13,7 @@ export interface Task {
 }
 
 export interface ScheduledTasks {
+  taskType: TaskTypes;
   name: string; 
   startTime: Date;  
   endTime: Date; 
@@ -23,8 +26,8 @@ export function generateSchedule(availability: Availability, tasks: Task[]): Tas
   for (const task of tasks) {
     if (task.startTime && task.endTime) {
       // task fits within availability and doesn't overlap existing tasks
-      if (isTaskValid(task.startTime, task.endTime,availability, scheduledTasks)) {
-        scheduledTasks.push({ name: task.name, startTime: task.startTime, endTime: task.endTime});
+      if (isTaskValid(task.startTime, task.endTime, availability, scheduledTasks)) {
+        scheduledTasks.push({taskType: TaskTypes.scheduled, name: task.name, startTime: task.startTime, endTime: task.endTime});
       } else {
           // later on we can return the unscheduledTasks 
         console.warn(`Task '${task.name}' conflicts with availability or other tasks.`);
@@ -62,7 +65,7 @@ function scheduleTaskWithDuration(task: Task, availability: Availability, schedu
 
     if(isTaskValid(startTime, endTime, availability, scheduledTasks)) 
       {
-        const newScheduledTask = {name: task.name, startTime, endTime}
+        const newScheduledTask = {taskType: TaskTypes.scheduled, name: task.name, startTime, endTime}
         return newScheduledTask; 
     }
    }
@@ -70,13 +73,4 @@ function scheduleTaskWithDuration(task: Task, availability: Availability, schedu
   return null 
 }
 
-
-
-  // TODO: export to lib file
-export function formatTime(date: Date): string {
-  const hours = date.getHours() % 12 || 12;
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const indicator = date.getHours() >= 12 ? "PM" : "AM";
-  return `${hours}:${minutes} ${indicator}`;
-  }
 

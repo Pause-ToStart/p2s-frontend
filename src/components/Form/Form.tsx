@@ -1,38 +1,41 @@
 'use client'
 import { useState } from "react";
 import React from 'react'
-import { Task, Availability, ScheduledTasks } from "../../app/generateSchedule";
+import { useRouter } from "next/navigation";
+import { Task, ScheduledTasks } from "../../app/lib/generateSchedule";
+import { convertStringtoDateTime } from "../../app/lib/time-conversion";
+import { formatTime } from "../../app/lib/time-conversion";
+import { TaskTypes } from "../../app/lib/enum/taskTypes";
+import { unscheduledTasks, availabilityTime } from "../../app/lib/tasks";
 
 const Form = () => {
-    // TODO: constraints for today, current time vs past time
-    // TODO: availability time left 
-    // TODO: set placeholders for input
-    // TODO: reset input once task is submitted OR user switches to another task type
-
-    const enum taskTypes {
-        duration = 'duration', scheduled = 'scheduled'
+    const router = useRouter()
+    const enum TimeShown {
+        current,
+        tomorrow
     }
-    const [availability, setAvailability] = useState({
+
+    const [availabilityForm, setAvailabilityForm] = useState({
         startTime: "9:00 am",
         endTime: "10:00 pm"
     })
-    const [durationTask, setDurationTask] = useState({
-        type: taskTypes.duration,
+    const [durationTaskForm, setDurationTaskForm] = useState({
+        type: TaskTypes.duration,
         name: "",
-        duration: "0"
+        duration: ""
     })
-    const [scheduledTask, setScheduledTask] = useState({
-        type: taskTypes.scheduled,
+    const [scheduledTaskForm, setScheduledTaskForm] = useState({
+        type: TaskTypes.scheduled,
         name: "",
         startTime: "",
         endTime: "",
     })
-    const [taskList, setTaskList] = useState([])
-    const [activeTaskTab, setActiveTaskTab] = useState<taskTypes>(taskTypes.duration)
+    const [taskList, setTaskList] = useState<(Task|ScheduledTasks)[]>([])
+    const [activeTaskTab, setActiveTaskTab] = useState<TaskTypes>(TaskTypes.duration)
 
     const handleAvailabilityChange = (e) =>
         {
-            setAvailability((prevState) => ({...prevState, [e.target.name]: e.target.value}))
+            setAvailabilityForm((prevState) => ({...prevState, [e.target.name]: e.target.value}))
         }
 
     const renderAvailability = () => {
@@ -40,65 +43,81 @@ const Form = () => {
             <>
             <div>Availability</div>
             <label>start time </label>
-            <input className="border-2" type="text" name="startTime" value={availability.startTime} onChange={handleAvailabilityChange}/>
+            <input className="border-2" type="text" name="startTime" placeholder="9:00 am" value={availabilityForm.startTime} onChange={handleAvailabilityChange}/>
             <label>end time </label>
-            <input className="border-2" type="text" name="endTime" value={availability.endTime} onChange={handleAvailabilityChange}/>
+            <input className="border-2" type="text" name="endTime" placeholder="10:00 pm"value={availabilityForm.endTime} onChange={handleAvailabilityChange}/>
             </>
         )
 
     }
 
+    const addTaskToList = (taskType) => {
+        let task = {}
+
+        switch(taskType) {
+            case TaskTypes.duration:
+                task = {
+                    type: durationTaskForm.type,
+                    name: durationTaskForm.name,
+                    duration: parseInt(durationTaskForm.duration)
+                }
+                setTaskList((prevList) => prevList.concat(task))
+                setDurationTaskForm({...durationTaskForm, name:"", duration:""})
+                break;
+            case TaskTypes.scheduled: 
+                task = {
+                    type: scheduledTaskForm.type,
+                    name: scheduledTaskForm.name,
+                    startTime: convertStringtoDateTime(scheduledTaskForm.startTime, TimeShown.tomorrow),
+                    endTime: convertStringtoDateTime(scheduledTaskForm.endTime, TimeShown.tomorrow)
+                }
+                setTaskList((prevList) => prevList.concat(task))
+                setScheduledTaskForm({...scheduledTaskForm, name: "", startTime: "", endTime: ""})
+                break;
+        }
+    }
+
     const handleDurationTaskChange = (e) => {
-        setDurationTask((prevState) => ({...prevState, [e.target.name]: e.target.value}))
+        setDurationTaskForm((prevState) => ({...prevState, [e.target.name]: e.target.value}))
     }
 
     const renderDurationTask = () => {
         return (
             <div>
             <label>task name </label>
-            <input className="border-2" type="text" name="name" value={durationTask.name} onChange={handleDurationTaskChange}/>
+            <input className="border-2" type="text" name="name" placeholder="workout" value={durationTaskForm.name} onChange={handleDurationTaskChange}/>
             <label>Duration in minutes</label>
-            <input className="border-2" type="text" name="duration" value={durationTask.duration} onChange={handleDurationTaskChange}></input>
+            <input className="border-2" type="text" name="duration" placeholder="60" value={durationTaskForm.duration} onChange={handleDurationTaskChange}></input>
             <button className="bg-slate-500 text-white rounded" onClick={(e) => {e.preventDefault()
-                const task  = {
-                    type: durationTask.type,
-                    name: durationTask.name,
-                    duration: durationTask.duration
-                }
-                setTaskList((prevList) => prevList.concat(task))
+                addTaskToList(TaskTypes.duration)
             }}>add duration task</button>
             </div>
         )
     }
 
     const handleScheduledTaskChange = (e) => {
-        setScheduledTask((prevState) => ({...prevState, [e.target.name]: e.target.value}))
+        setScheduledTaskForm((prevState) => ({...prevState, [e.target.name]: e.target.value}))
     }
 
     const renderScheduledTask = () => {
         return(
             <div>
             <label>Task name </label>
-            <input className="border-2" type="text" name="name" value={scheduledTask.name} onChange={handleScheduledTaskChange}/>
+            <input className="border-2" type="text" name="name" placeholder="workout" value={scheduledTaskForm.name} onChange={handleScheduledTaskChange}/>
             <label>Start Time</label>
-            <input className="border-2" type="text" name="startTime" value={scheduledTask.startTime} onChange={handleScheduledTaskChange}></input>
+            <input className="border-2" type="text" name="startTime" placeholder="3:00 pm" value={scheduledTaskForm.startTime} onChange={handleScheduledTaskChange}></input>
             <label>End Time</label>
-            <input className="border-2" type="text" name="endTime" value={scheduledTask.endTime} onChange={handleScheduledTaskChange}></input>
-            <button className="bg-slate-500 text-white rounded" onClick={(e) => {e.preventDefault()
-                const task = {
-                    type: scheduledTask.type,
-                    name: scheduledTask.name,
-                    startTime: scheduledTask.startTime,
-                    endTime: scheduledTask.endTime
-                }
-                setTaskList((prevList) => prevList.concat(task))
+            <input className="border-2" type="text" name="endTime" placeholder="3:30 pm" value={scheduledTaskForm.endTime} onChange={handleScheduledTaskChange}></input>
+            <button className="bg-slate-500 text-white rounded" onClick={(e) => {
+                e.preventDefault()
+                addTaskToList(TaskTypes.scheduled)
             }}>add scheduled task</button>
             </div>
         )
     }
 
     const renderCreateTask = () => {
-        const tabs = [taskTypes.duration, taskTypes.scheduled]
+        const tabs = [TaskTypes.duration, TaskTypes.scheduled]
 
         return (
         <>
@@ -113,7 +132,7 @@ const Form = () => {
                 )
             })}
         </div>
-        {activeTaskTab === taskTypes.duration ? renderDurationTask() :renderScheduledTask()}
+        {activeTaskTab === TaskTypes.duration ? renderDurationTask() :renderScheduledTask()}
         </>
         )
 
@@ -134,9 +153,9 @@ const Form = () => {
                         <div key={`task-list-item-${index}`}>
                             <span>{`Type: ${task.type} - `}</span>
                             <span>{`Name: ${task.name} - `}</span>
-                            {task.type === taskTypes.duration ? 
+                            {task.type === TaskTypes.duration ? 
                                 <span>{`duration: ${task.duration}`}</span>
-                                : <><span>{`start time: ${task.startTime}`}</span> <span>{`end time: ${task.endTime}`}</span></>
+                                : <><span>{`start time: ${formatTime(task.startTime)}`}</span> <span>{`end time: ${formatTime(task.endTime)}`}</span></>
                             }
                         </div>
                     )
@@ -154,12 +173,10 @@ const Form = () => {
     }
 
     const handleSubmitTasks = () => {
-        // TODO:
-        /*
-        resets form
-        converts string formats to date formats
-        displays schedule
-        */
+        availabilityTime.startTime = convertStringtoDateTime(availabilityForm.startTime, TimeShown.tomorrow)
+        availabilityTime.endTime = convertStringtoDateTime(availabilityForm.endTime, TimeShown.tomorrow) 
+        unscheduledTasks.push(...taskList)
+        router.push('/schedule')
     }
 
     return (
@@ -169,7 +186,12 @@ const Form = () => {
             {renderAvailability()}
             {renderCreateTask()}
             {renderTaskList()}
-            <button className="bg-slate-500 text-white rounded">submit tasks</button>
+            <button className="bg-slate-500 text-white rounded" 
+                onClick={(e) => {
+                    e.preventDefault()
+                    handleSubmitTasks()
+                }}>submit tasks and view schedule
+            </button>
         </form>
         </>
     )
