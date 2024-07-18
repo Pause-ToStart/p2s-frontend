@@ -30,7 +30,7 @@ const Form = () => {
         startTime: "",
         endTime: "",
     })
-    const [taskList, setTaskList] = useState<(Task|ScheduledTasks)[]>([])
+    const [taskList, setTaskList] = useState<(any)[]>([])
     const [activeTaskTab, setActiveTaskTab] = useState<TaskTypes>(TaskTypes.duration)
 
     const handleAvailabilityChange = (e) =>
@@ -52,26 +52,25 @@ const Form = () => {
     }
 
     const addTaskToList = (taskType) => {
-        let task = {}
 
         switch(taskType) {
             case TaskTypes.duration:
-                task = {
-                    type: durationTaskForm.type,
+                const durationTask : Task = {
+                    taskType: durationTaskForm.type,
                     name: durationTaskForm.name,
                     duration: parseInt(durationTaskForm.duration)
                 }
-                setTaskList((prevList) => prevList.concat(task))
+                setTaskList((prevList) => prevList.concat(durationTask))
                 setDurationTaskForm({...durationTaskForm, name:"", duration:""})
                 break;
             case TaskTypes.scheduled: 
-                task = {
-                    type: scheduledTaskForm.type,
+                const scheduledTask = {
+                    taskType: scheduledTaskForm.type,
                     name: scheduledTaskForm.name,
                     startTime: convertStringtoDateTime(scheduledTaskForm.startTime, TimeShown.tomorrow),
                     endTime: convertStringtoDateTime(scheduledTaskForm.endTime, TimeShown.tomorrow)
                 }
-                setTaskList((prevList) => prevList.concat(task))
+                setTaskList((prevList) => prevList.concat(scheduledTask))
                 setScheduledTaskForm({...scheduledTaskForm, name: "", startTime: "", endTime: ""})
                 break;
         }
@@ -151,9 +150,9 @@ const Form = () => {
                 {taskList.map((task, index) => {
                     return(
                         <div key={`task-list-item-${index}`}>
-                            <span>{`Type: ${task.type} - `}</span>
+                            <span>{`Type: ${task.taskType} - `}</span>
                             <span>{`Name: ${task.name} - `}</span>
-                            {task.type === TaskTypes.duration ? 
+                            {task.hasOwnProperty(TaskTypes.duration) ? 
                                 <span>{`duration: ${task.duration}`}</span>
                                 : <><span>{`start time: ${formatTime(task.startTime)}`}</span> <span>{`end time: ${formatTime(task.endTime)}`}</span></>
                             }
