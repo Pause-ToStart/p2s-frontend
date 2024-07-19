@@ -1,15 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import { Task, formatTime } from "../generateSchedule";
-import { generateSchedule } from "../generateSchedule";
-import { availabilityOne, testTasks } from "../lib/placeholder-data";
+import React, { useState, useEffect } from "react";
+import { formatTime } from "../lib/time-conversion";
+import { generateSchedule } from "../lib/generateSchedule";
+import { availabilityTime, unscheduledTasks } from "../lib/tasks";
+import { useRouter } from "next/navigation";
+
 
 export default function DisplaySchedule() {
+  const router = useRouter()
   const [schedule, setSchedule] = useState([]);
 
+  useEffect(() => {
+    setSchedule(generateSchedule(availabilityTime, unscheduledTasks));
+  }, [])
+
   const handleClick = () => {
-    setSchedule(generateSchedule(availabilityOne, testTasks));
+    availabilityTime.startTime = null;
+    availabilityTime.endTime = null;
+    unscheduledTasks.length = 0
+    router.push('/')
   };
 
   return (
@@ -28,7 +38,7 @@ export default function DisplaySchedule() {
         className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
         onClick={handleClick}
       >
-        Submit
+        create new schedule
       </button>
       
     </div>
